@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1C1917">
+<title>Cut the Fluff</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --orange: #E86C3A; --orange-light: #FFFBF7; --orange-bg: rgba(232,108,58,0.08);
+  --brown: #8B7355; --brown-light: #F5F0EB;
+  --tan: #D4885A; --green: #7BA05B; --gold: #D4A574;
+  --stone-50: #FAFAF9; --stone-100: #F5F5F4; --stone-200: #E7E5E4;
+  --stone-300: #D6D3D1; --stone-400: #A8A29E; --stone-500: #78716C;
+  --stone-700: #57534E; --stone-900: #1C1917;
+  --bg: #F7F5F2;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { height: 100%; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--bg); color: var(--stone-900);
+  min-height: 100%; max-width: 520px; margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+input, textarea, select { font-family: inherit; }
+
+/* Header */
+.header {
+  background: var(--stone-900); color: #FFF;
+  padding: calc(12px + var(--safe-top)) 20px 14px;
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 12px;
+}
+.header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+.header-sub { font-size: 11px; color: var(--stone-400); font-weight: 500; }
+.header-back {
+  background: none; border: none; color: #FFF; padding: 4px;
+  display: flex; align-items: center;
+}
+
+/* Nav */
+.nav {
+  display: flex; background: #FFF; border-bottom: 1px solid var(--stone-200);
+  position: sticky; top: 52px; z-index: 25; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  padding: 12px 13px; background: none; border: none;
+  font-size: 12px; font-weight: 500; color: var(--stone-500);
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: all 0.15s;
+}
+.nav-btn.active { font-weight: 700; color: var(--orange); border-bottom-color: var(--orange); }
+
+/* Content */
+.page { padding: 20px 20px 100px; display: none; }
+.page.active { display: block; }
+.section-hidden { display: none; }
+
+/* Typography */
+h2 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.02em; }
+h3 { font-size: 15px; font-weight: 700; margin: 20px 0 10px; }
+.p { font-size: 14px; line-height: 1.7; color: var(--stone-700); margin: 0 0 12px; }
+.p-small { font-size: 13px; line-height: 1.7; color: var(--stone-700); margin: 0; }
+
+/* Cards */
+.card {
+  background: #FFF; border-radius: 12px; border: 1px solid var(--stone-200);
+  padding: 18px 20px; margin-bottom: 12px;
+}
+.card-warm { background: var(--orange-light); border-color: rgba(232,108,58,0.13); }
+.card-brown { background: var(--brown-light); border-color: rgba(139,115,85,0.13); }
+.card-dark { background: var(--stone-900); color: #FFF; border: none; }
+.card-clickable { cursor: pointer; transition: transform 0.1s; }
+.card-clickable:active { transform: scale(0.985); }
+
+/* Tags */
+.tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 3px 8px; border-radius: 4px;
+}
+.tag-orange { color: var(--orange); background: var(--orange-bg); }
+.tag-brown { color: var(--brown); background: rgba(139,115,85,0.1); }
+.tag-green { color: var(--green); background: rgba(123,160,91,0.1); }
+
+/* Buttons */
+.btn {
+  background: var(--orange); color: #FFF; border: none; border-radius: 8px;
+  padding: 10px 18px; font-size: 13px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-outline {
+  background: none; border: 1px solid var(--stone-300); border-radius: 8px;
+  padding: 10px 18px; font-size: 13px; font-weight: 600; color: var(--stone-700);
+}
+.btn-sm { padding: 7px 12px; font-size: 12px; }
+
+/* Form */
+.input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--stone-300);
+  border-radius: 8px; font-size: 14px; outline: none; background: #FFF;
+}
+.input:focus { border-color: var(--orange); }
+.label { font-size: 11px; font-weight: 600; color: var(--stone-500); display: block; margin-bottom: 4px; }
+
+/* Stat cards */
+.stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+.stat { text-align: center; }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--stone-400); font-weight: 600; }
+.stat-value { font-size: 22px; font-weight: 700; color: var(--orange); font-family: 'Fraunces', serif; }
+.stat-sub { font-size: 11px; color: var(--stone-400); }
+
+/* Day cards */
+.day-card {
+  display: flex; justify-content: space-between; align-items: center;
+  border-left: 4px solid var(--orange);
+}
+.day-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.day-title { font-size: 15px; font-weight: 700; }
+.day-meta { font-size: 12px; color: var(--stone-400); }
+
+/* Exercise in day view */
+.ex-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid var(--stone-100);
+}
+.ex-row:last-child { border-bottom: none; }
+.ex-name { font-size: 14px; font-weight: 700; }
+.ex-detail { font-size: 12px; color: var(--stone-400); }
+.ex-note { font-size: 12px; color: var(--orange); margin-top: 4px; font-style: italic; }
+.ex-muscles { font-size: 12px; color: var(--stone-400); margin-top: 4px; }
+.ex-desc { font-size: 13px; color: var(--stone-500); margin-top: 6px; }
+
+/* Checklist */
+.check-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--stone-100);
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+}
+.check-row:last-child { border-bottom: none; }
+.check-box {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 2px solid var(--stone-300); display: flex;
+  align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.check-box.checked { background: var(--orange); border-color: var(--orange); }
+.check-label { font-size: 13px; color: var(--stone-500); }
+.check-row.checked .check-label { color: var(--stone-900); font-weight: 600; }
+
+/* Log entry */
+.log-entry-tags { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.log-entry-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.log-delete { background: none; border: none; color: var(--stone-300); padding: 2px; }
+
+/* Plate */
+.plate { display: flex; gap: 8px; flex-wrap: wrap; }
+.plate-item {
+  flex: 1 1 100px; padding: 10px 12px; border-radius: 8px;
+  border: 1.5px solid; background: #FFF;
+}
+.plate-pct { font-size: 20px; font-weight: 700; font-family: 'Fraunces', serif; }
+.plate-label { font-size: 12px; font-weight: 700; }
+.plate-desc { font-size: 11px; color: var(--stone-400); }
+
+/* Arrows for lists */
+.arrow-item { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; font-size: 13px; }
+.arrow { color: var(--orange); font-weight: 700; flex-shrink: 0; }
+.arrow-light { color: var(--stone-300); }
+
+/* Phase toggle */
+.phase-toggle { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+
+/* Data tools */
+.data-tools { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+
+/* Meal card */
+.meal-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.meal-tags { display: flex; gap: 10px; margin-bottom: 8px; }
+
+/* Responsive */
+@media (max-width: 380px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .plate-item { flex: 1 1 140px; }
+}
+
+/* Chevron icon for clickable items */
+.chevron-icon { color: var(--stone-300); flex-shrink: 0; }
+
+/* Add log form */
+.log-form { display: none; }
+.log-form.active { display: block; }
+.log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<div class="header" id="mainHeader">
+  <div id="headerBack" style="display:none">
+    <button class="header-back" onclick="goBack()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="12 4 6 10 12 16"/></svg>
+    </button>
+  </div>
+  <div>
+    <div class="header-title" id="headerTitle">Cut the Fluff</div>
+    <div class="header-sub" id="headerSub">Your training companion</div>
+  </div>
+</div>
+
+<!-- ═══════════ NAV ═══════════ -->
+<div class="nav" id="mainNav">
+  <button class="nav-btn active" onclick="switchTab('home')">Overview</button>
+  <button class="nav-btn" onclick="switchTab('training')">Training</button>
+  <button class="nav-btn" onclick="switchTab('exercises')">Exercises</button>
+  <button class="nav-btn" onclick="switchTab('nutrition')">Nutrition</button>
+  <button class="nav-btn" onclick="switchTab('travel')">Travel</button>
+  <button class="nav-btn" onclick="switchTab('log')">Log</button>
+</div>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div class="page active" id="page-home">
+  <h2>The Big Picture</h2>
+  <p class="p">You're 183cm, 81-82kg, around 23% body fat. You're active but haven't pushed past maintenance-level fitness. The "doughy midsection" is simply stored energy — it goes away through a moderate caloric deficit combined with resistance training that tells your body to keep muscle and burn fat instead.</p>
+  <p class="p">Your target is around 75-77kg at roughly 15% body fat — that's where love handles disappear and muscle definition becomes visible. At a sustainable 0.5kg/week loss: 5-7 months depending on travel consistency.</p>
+
+  <div class="stats">
+    <div class="card stat"><div class="stat-label">Target BF</div><div class="stat-value">~15%</div><div class="stat-sub">from ~23%</div></div>
+    <div class="card stat"><div class="stat-label">Timeline</div><div class="stat-value">5-7mo</div><div class="stat-sub">sustainable</div></div>
+    <div class="card stat"><div class="stat-label">Daily Cal</div><div class="stat-value">~1,850</div><div class="stat-sub">deficit</div></div>
+  </div>
+
+  <h3>The Three Levers</h3>
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--orange)">1. Moderate Caloric Deficit</div>
+    <p class="p-small">Your TDEE is ~2,300 kcal. Eating ~1,850/day creates a 400-500 kcal deficit — enough to lose 0.5kg/week without misery. The key lever is protein: aim for 130-150g/day. This preserves muscle and keeps you full. Everything else (carbs, fats) is flexible around that protein target.</p>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--tan)">2. Resistance Training</div>
+    <p class="p-small">Your current routine is great for general fitness but doesn't build muscle or reshape your body. We're adding 3-4 days of progressive resistance training. Muscle is what makes you look "lean" instead of just "thin" — without it, losing fat just makes you a smaller version of the same shape.</p>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--brown)">3. Consistency Over Perfection</div>
+    <p class="p-small">You travel ~25-30% of your time. If the plan collapses during travel, you lose a third of your progress. So we build two modes: "home mode" (optimised) and "travel mode" (simplified but still effective). A B+ effort sustained beats an A+ effort that collapses every few weeks.</p>
+  </div>
+
+  <h3>Week 1 Checklist</h3>
+  <div class="card card-dark">
+    <div class="arrow-item" style="color:#D6D3D1"><span class="arrow">→</span>Do the Mon, Tue, Thu, Fri workouts as written</div>
+    <div class="arrow-item" style="color:#D6D3D1"><span class="arrow">→</span>Buy eggs, canned tuna, dhal, and soy chunks in bulk</div>
+    <div class="arrow-item" style="color:#D6D3D1"><span class="arrow">→</span>Halve your normal rice portion at every meal</div>
+    <div class="arrow-item" style="color:#D6D3D1"><span class="arrow">→</span>Download MyFitnessPal — log just protein for 3 days</div>
+    <div class="arrow-item" style="color:#D6D3D1"><span class="arrow">→</span>Weigh yourself 2 mornings, note the average</div>
+    <div class="arrow-item" style="color:#D6D3D1"><span class="arrow">→</span>Make a big pot of soup for the week (see Nutrition tab)</div>
+  </div>
+</div>
+
+<!-- ═══════════ TRAINING ═══════════ -->
+<div class="page" id="page-training">
+  <h2>Training Plan</h2>
+  <p class="p">4-5 sessions per week, 30-40 minutes each. Tap any day to see the full workout with exercise details.</p>
+  <div class="phase-toggle">
+    <button class="btn" id="phase1btn" onclick="setPhase(1)">Phase 1 — Weeks 1–6</button>
+    <button class="btn-outline" id="phase2btn" onclick="setPhase(2)">Phase 2 — Weeks 7+</button>
+  </div>
+  <div id="phaseDesc1" class="card card-warm" style="margin-bottom:16px">
+    <p class="p-small" style="margin:0">Phase 1 uses your apartment gym dumbbells, bodyweight, pool, and running track. The goal is to build the habit, learn the movements, and get strong enough to make a real gym worthwhile. After 4-6 weeks of consistent training, you'll be ready (and motivated) to transition.</p>
+  </div>
+  <div id="phaseDesc2" class="card card-brown section-hidden" style="margin-bottom:16px">
+    <p class="p-small" style="margin:0">Phase 2 assumes you've joined a gym with barbells, a squat rack, cables, and machines. The same push/pull/legs/circuit structure continues — you're not learning a new routine, just upgrading your tools. Barbells let you load progressively heavier, which is the primary driver of getting stronger and changing how your body looks.</p>
+  </div>
+  <div id="daysList"></div>
+  <h3>Progression Rules</h3>
+  <p class="p">When you can complete all sets and reps with clean form, increase the weight next session — even by just 0.5-1kg. If you can't increase weight, add 1-2 reps per set. Write down your numbers after every session (use the Log tab). This simple habit is what separates people who get results from people who just "work out."</p>
+</div>
+
+<!-- ═══════════ DAY DETAIL (overlay) ═══════════ -->
+<div class="page" id="page-day" style="display:none"></div>
+
+<!-- ═══════════ EXERCISE DETAIL (overlay) ═══════════ -->
+<div class="page" id="page-exercise" style="display:none"></div>
+
+<!-- ═══════════ EXERCISES LIBRARY ═══════════ -->
+<div class="page" id="page-exercises">
+  <h2>Exercise Library</h2>
+  <p class="p">Tap any exercise to see how to perform it with proper form, common mistakes to avoid, and which muscles it works.</p>
+  <div id="exerciseLibrary"></div>
+</div>
+
+<!-- ═══════════ NUTRITION ═══════════ -->
+<div class="page" id="page-nutrition">
+  <h2>Nutrition</h2>
+  <p class="p">Hit your protein target (~130-150g/day), stay around 1,800-1,900 calories, and be flexible about everything else. Track protein only using MyFitnessPal — most Sri Lankan staples are already in the database. That's your 80/20.</p>
+
+  <div class="card card-warm">
+    <div style="font-weight:700;font-size:14px;margin-bottom:10px">The Plate Rule (every meal)</div>
+    <div class="plate">
+      <div class="plate-item" style="border-color:rgba(232,108,58,0.3)"><div class="plate-pct" style="color:var(--orange)">40%</div><div class="plate-label">Protein</div><div class="plate-desc">Fish, chicken, eggs, dhal, paneer, soy chunks</div></div>
+      <div class="plate-item" style="border-color:rgba(123,160,91,0.3)"><div class="plate-pct" style="color:var(--green)">35%</div><div class="plate-label">Vegetables</div><div class="plate-desc">Curries, salad, gotukola, leeks, beans</div></div>
+      <div class="plate-item" style="border-color:rgba(212,165,116,0.3)"><div class="plate-pct" style="color:var(--gold)">25%</div><div class="plate-label">Carbs</div><div class="plate-desc">Rice (small!), bread, potato</div></div>
+    </div>
+    <p style="font-size:12px;color:var(--stone-400);margin-top:10px;margin-bottom:0;font-style:italic">The biggest shift: less rice, more protein and vegetables. A typical SL plate is 60%+ rice — flip that ratio.</p>
+  </div>
+
+  <h3>Protein Sources (Sri Lanka)</h3>
+  <div class="card">
+    <p class="p-small" style="margin-bottom:8px"><strong style="color:var(--orange)">Daily staples:</strong> Eggs (6g each — eat 3-4/day), canned/fresh tuna or mackerel, chicken, dhal/parippu, curd/yogurt</p>
+    <p class="p-small" style="margin-bottom:8px"><strong style="color:var(--tan)">Regular rotation:</strong> Fresh fish (seer, thalapath, prawns), paneer, tofu, chickpeas, soy chunks/TVP (~50g protein per 100g dry — incredibly cheap and available everywhere)</p>
+    <p class="p-small"><strong style="color:var(--brown)">Supplement:</strong> Whey protein powder (available in Colombo or online) — 1 scoop = ~25g protein when whole food falls short</p>
+  </div>
+
+  <h3>Sample Day — Sri Lanka (Home Mode)</h3>
+  <div class="card">
+    <div class="meal-title">Meal 1 — Late Morning (10-11am)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>3-egg omelette with onion, tomato, green chilli</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>1 slice wholemeal bread or 1 small hopper</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>Black coffee or plain tea</div>
+    <p style="font-size:12px;color:var(--stone-400);margin-top:6px;font-style:italic;margin-bottom:0">~400 kcal · 25g protein</p>
+  </div>
+  <div class="card">
+    <div class="meal-title">Lunch — Soup (12:30-1:30pm)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>A bowl from your batch-cooked soup (see below)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>Optional: a slice of bread or 2 crackers on the side</div>
+    <p style="font-size:12px;color:var(--stone-400);margin-top:6px;font-style:italic;margin-bottom:0">~300-400 kcal · 20-30g protein (depending on soup)</p>
+  </div>
+  <div class="card">
+    <div class="meal-title">Dinner (7-8pm)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>Grilled or curried fish/chicken (~200g cooked)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>½ cup rice (weigh it once to calibrate your eye)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>2-3 vegetable curries</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>Dhal/parippu on the side</div>
+    <p style="font-size:12px;color:var(--stone-400);margin-top:6px;font-style:italic;margin-bottom:0">~700-800 kcal · 45-50g protein</p>
+  </div>
+  <div class="card">
+    <div class="meal-title">Evening Snack (if needed)</div>
+    <div class="arrow-item"><span class="arrow-light">·</span>2 boiled eggs, or soy chunks stir-fry, or roasted chickpeas</div>
+    <p style="font-size:12px;color:var(--stone-400);margin-top:6px;font-style:italic;margin-bottom:0">~150-200 kcal · 15-20g protein</p>
+  </div>
+  <div class="card card-warm" style="border-color:rgba(232,108,58,0.2)">
+    <strong style="color:var(--orange)">Daily total: ~1,550-1,800 kcal · 105-125g protein</strong><br>
+    <span style="font-size:13px;color:var(--stone-700)">This leaves a ~200 kcal buffer for cooking oils, fruit, or misjudgement. The protein is slightly under ideal — a whey shake closes the gap when needed.</span>
+  </div>
+
+  <h3>Soup for Lunch — Batch Cooking</h3>
+  <p class="p">A large pot on Sunday or Monday gives you 4-6 lunches with zero daily effort. Soups are perfect for the deficit — filling, high-volume, and you control exactly what goes in.</p>
+  <div id="soupList"></div>
+
+  <h3>International Cooking Ideas</h3>
+  <p class="p">Dishes from home and places you've lived, with tweaks to fit the plan:</p>
+  <div id="intlMealList"></div>
+
+  <h3>What to Cut or Reduce</h3>
+  <p class="p">You don't need to eliminate anything, but these are the highest-impact reductions: excessive rice portions (the single biggest calorie source in most SL diets), sweetened tea or Milo, fried short eats (rolls, cutlets, patties — calorie bombs), coconut milk-heavy gravies (use in moderation), and sugary biscuits with tea.</p>
+</div>
+
+<!-- ═══════════ TRAVEL ═══════════ -->
+<div class="page" id="page-travel">
+  <h2>Travel Mode</h2>
+  <p class="p">Your trips are 1-2 weeks every 6-8 weeks. The goal during travel is simple: don't go backwards. You won't optimise — you just hold the line.</p>
+
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--orange)">Morning Rule</div>
+    <p class="p-small">Work out in the morning before the day starts. You already know this about yourself — evenings disappear to dinners, drinks, and colleagues. Set your alarm 35 minutes earlier. That's it. Non-negotiable on travel days.</p>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--tan)">Hotel Room Workout (20-25 min)</div>
+    <p class="p-small" style="margin-bottom:8px">When there's no gym available, do 4 rounds of this circuit with 60-90 seconds rest between rounds:</p>
+    <div class="arrow-item"><span class="arrow">→</span>15 push-ups</div>
+    <div class="arrow-item"><span class="arrow">→</span>15 bodyweight squats</div>
+    <div class="arrow-item"><span class="arrow">→</span>10 lunges each leg</div>
+    <div class="arrow-item"><span class="arrow">→</span>10 burpees</div>
+    <div class="arrow-item"><span class="arrow">→</span>30-second plank</div>
+    <p class="p-small" style="margin-top:10px;font-style:italic;color:var(--stone-400)">If the hotel has a gym with dumbbells, do your normal push or pull day with whatever's available. Something always beats nothing.</p>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--brown)">Minimum Viable Commitment</div>
+    <p class="p-small">3 sessions per travel week. That's it. Three. If you hit three, you're winning. If you hit four, you're a hero. Don't aim for five and end up doing zero because the target felt impossible.</p>
+  </div>
+
+  <h3>Eating in Germany & Europe</h3>
+  <div class="card">
+    <div style="font-weight:700;font-size:13px;color:var(--orange);margin-bottom:4px">Breakfast (hotel buffet) — your easiest win</div>
+    <p class="p-small" style="margin-bottom:12px">German hotel breakfasts are protein-rich if you choose well: load up on eggs (Rührei, gekochte Eier), cheese, Aufschnitt, yogurt, tomatoes. Skip the Brötchen basket and the Nutella. You know the drill — you grew up with this. Just choose the protein side of the buffet.</p>
+    <div style="font-weight:700;font-size:13px;color:var(--tan);margin-bottom:4px">Lunch</div>
+    <p class="p-small" style="margin-bottom:12px">Salad with protein from any restaurant, or grab a Hähnchenbrust-Salat from Rewe or Edeka for a few euros. German supermarkets also have great Magerquark (500g, ~60g protein, under €1) — if you can stomach it plain or with some berries, it's the best protein-per-euro deal in Europe.</p>
+    <div style="font-weight:700;font-size:13px;color:var(--brown);margin-bottom:4px">Dinner (the social one)</div>
+    <p class="p-small">This is where you'll drink and eat with colleagues or friends. That's fine — it's part of the trip. Choose grilled fish or meat with vegetables as your main. Skip the bread basket and the Kartoffelbeilage if you've had enough carbs. Eat slowly, enjoy the company, and don't stress about it being perfect.</p>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--orange)">The Alcohol Rule</div>
+    <p class="p-small">Allow yourself 2-3 drinks in a social evening. Choose lower-calorie options where it doesn't feel forced (a Helles over a Weizen, wine or G&T over cocktails). But the real damage from alcohol isn't the calories in the drink — it's the Döner at midnight and the skipped morning workout. Avoid both. If you drink, set your alarm anyway and show up to the hotel gym even if it's only for 20 minutes. The habit matters more than the performance.</p>
+  </div>
+  <div class="card card-dark">
+    <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;margin-bottom:8px">The Math That Matters</div>
+    <p style="font-size:13px;color:#D6D3D1;margin:0;line-height:1.7">If you're in Sri Lanka 5-6 weeks and travel 1-2 weeks in an 8-week cycle, and you lose 0.5kg/week at home and just hold steady during travel, you still lose 2.5-3kg every two months. That's 10+ kg in 7-8 months. The people who fail aren't the ones with imperfect travel weeks — they're the ones who use travel as an excuse to abandon everything, gain 2kg, and spend two weeks getting back to where they started.</p>
+  </div>
+</div>
+
+<!-- ═══════════ LOG ═══════════ -->
+<div class="page" id="page-log">
+  <h2>Training Log</h2>
+  <p class="p">Track your weekly non-negotiables and log your progress. All data is saved on this device.</p>
+
+  <h3>This Week's Scorecard</h3>
+  <div class="card" id="scorecardContainer"></div>
+
+  <h3>Progress Log</h3>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="btn" onclick="toggleLogForm()">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="3" x2="9" y2="15"/><line x1="3" y1="9" x2="15" y2="9"/></svg>
+      Add Entry
+    </button>
+  </div>
+
+  <div class="log-form card card-warm" id="logForm">
+    <div class="log-grid">
+      <div><label class="label">Date</label><input type="date" class="input" id="logDate"></div>
+      <div><label class="label">Weight (kg)</label><input type="number" step="0.1" placeholder="81.5" class="input" id="logWeight"></div>
+      <div><label class="label">Protein (g)</label><input type="number" placeholder="135" class="input" id="logProtein"></div>
+      <div><label class="label">Sessions this week</label><input type="number" placeholder="4" class="input" id="logSessions"></div>
+    </div>
+    <div style="margin-bottom:10px"><label class="label">Notes</label><textarea rows="2" placeholder="How the week went, what worked, what didn't..." class="input" id="logNotes" style="resize:vertical"></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="saveLogEntry()">Save</button>
+      <button class="btn-outline" onclick="toggleLogForm()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="logEntries"></div>
+
+  <h3>Data Management</h3>
+  <div class="data-tools">
+    <button class="btn-outline btn-sm" onclick="exportData()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 10v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-3"/><polyline points="4 6 8 2 12 6"/><line x1="8" y1="2" x2="8" y2="11"/></svg>
+      Export All Data
+    </button>
+    <button class="btn-outline btn-sm" onclick="document.getElementById('importFile').click()">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 10v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-3"/><polyline points="4 7 8 11 12 7"/><line x1="8" y1="11" x2="8" y2="2"/></svg>
+      Import Data
+    </button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+
+  <h3>Other Progress Measures</h3>
+  <div class="card">
+    <p class="p-small" style="margin-bottom:8px"><strong>Monthly photos:</strong> Same lighting, same pose, same time of day. Front, side, back. You'll see changes before the scale shows them.</p>
+    <p class="p-small" style="margin-bottom:8px"><strong>Strength progression:</strong> Are your training numbers going up? If you're losing weight AND getting stronger, everything is working perfectly.</p>
+    <p class="p-small"><strong>How clothes fit:</strong> The most honest measure. When your trousers feel looser at the waist and tighter at the thighs, you'll know.</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+
+const EXERCISES = {
+  pushups:{name:"Push-ups",category:"Upper Push",equipment:"Bodyweight",description:"The classic chest and triceps builder. Start in a high plank position — hands slightly wider than shoulder-width, body forming a straight line from head to heels. Lower your chest to just above the floor by bending your elbows (keep them at roughly 45° from your body, not flared out wide). Push back up to full arm extension.",tips:"Keep your core braced the entire time — if your hips sag, the set is over. To make it harder, elevate your feet on a step or bench. To make it easier, do them from your knees or against a wall. Aim for controlled tempo: 2 seconds down, 1 second up.",muscles:"Chest, shoulders, triceps, core"},
+  db_overhead_press:{name:"Dumbbell Overhead Press",category:"Upper Push",equipment:"Dumbbells",description:"Stand or sit with a dumbbell in each hand at shoulder height, palms facing forward. Press both dumbbells straight up overhead until your arms are fully extended, then lower them back to shoulder height under control.",tips:"Don't arch your lower back — brace your abs as if someone's about to poke you in the stomach. If standing, keep a slight bend in your knees. The dumbbells should travel in a slight arc, ending up directly over your shoulders at the top, not in front of your face.",muscles:"Shoulders (deltoids), triceps, upper chest"},
+  db_chest_press_floor:{name:"Dumbbell Floor Press",category:"Upper Push",equipment:"Dumbbells",description:"Lie on your back on the floor (no bench needed) with a dumbbell in each hand. Start with arms extended above your chest, palms facing your feet. Lower the dumbbells until your upper arms (triceps) touch the floor — pause briefly — then press back up.",tips:"The floor limits your range of motion, which is actually a feature: it protects your shoulders and forces you to press from a dead stop, building raw strength. Don't bounce off the floor. Let your arms settle, then press. Keep your feet flat on the ground and your lower back in a natural arch.",muscles:"Chest, triceps, shoulders"},
+  lateral_raises:{name:"Lateral Raises",category:"Upper Push",equipment:"Dumbbells",description:"Stand holding a dumbbell in each hand at your sides, palms facing inward. With a slight bend in your elbows (locked in place throughout), raise both arms out to the sides until they're parallel with the floor — like a bird spreading its wings. Lower slowly.",tips:"This exercise doesn't need heavy weight. Seriously — 3-5kg dumbbells are plenty if done properly. Lead with your elbows, not your hands. Think about pouring water from a jug at the top of the movement (pinky slightly higher than thumb). If you're swinging the weights up, they're too heavy.",muscles:"Side deltoids (the muscle that gives your shoulders width)"},
+  plank:{name:"Plank Hold",category:"Core",equipment:"Bodyweight",description:"Get into a forearm plank: elbows directly under shoulders, forearms on the ground, body in a straight line from head to heels. Hold this position without letting your hips drop or pike up.",tips:"Squeeze your glutes, brace your abs, and breathe normally. If 45 seconds is easy, don't just add time forever — make it harder by extending one arm forward, or lifting one foot off the ground. A 60-second plank with perfect tension is worth more than a 3-minute sloppy one.",muscles:"Entire core — rectus abdominis, obliques, transverse abdominis, lower back"},
+  dead_bugs:{name:"Dead Bugs",category:"Core",equipment:"Bodyweight",description:"Lie on your back with arms pointing straight up to the ceiling and knees bent at 90° (shins parallel to the floor). Slowly extend your right arm overhead and your left leg out straight simultaneously, hovering both just above the floor. Return to start and repeat on the other side.",tips:"The key is keeping your lower back pressed flat against the floor throughout. If your back arches, you've gone too far. This looks easy and feels easy for the first 3 reps — by rep 8 it should be burning. If it's not, slow down. Each rep should take 3-4 seconds.",muscles:"Deep core stabilisers, hip flexors"},
+  goblet_squat:{name:"Goblet Squat",category:"Lower Body",equipment:"Dumbbell",description:"Hold a single heavy dumbbell vertically against your chest, cupping the top end with both hands (like holding a goblet). Stand with feet slightly wider than shoulder-width, toes pointed out about 15-30°. Squat down by pushing your hips back and bending your knees, going as deep as you comfortably can — ideally until your thighs are parallel to the floor or below. Drive back up through your heels.",tips:"The dumbbell acts as a counterbalance, making it easier to squat deep with good form. Keep your chest up and elbows inside your knees — your elbows can even push your knees apart at the bottom. This is the single best leg exercise you can do with limited equipment.",muscles:"Quads, glutes, core, inner thighs"},
+  walking_lunges:{name:"Walking Lunges",category:"Lower Body",equipment:"Bodyweight / Dumbbells",description:"Take a large step forward with one leg, lower your back knee toward the ground until both knees are at about 90°, then push off your front foot and step forward with the other leg. Continue alternating — you're literally walking forward in lunges.",tips:"Keep your torso upright, don't lean forward. Your front knee should track over your toes, not cave inward. If you don't have space to walk, do them in place (reverse lunges — step backward instead). Hold dumbbells at your sides to add weight.",muscles:"Quads, glutes, hamstrings, balance/stability"},
+  rdl:{name:"Romanian Deadlift (Dumbbells)",category:"Lower Body",equipment:"Dumbbells",description:"Stand holding dumbbells in front of your thighs, palms facing your body. With a very slight bend in your knees (and that bend stays fixed throughout), hinge at your hips — push your butt backward while lowering the dumbbells along your legs. You should feel a deep stretch in your hamstrings. Go down until you feel that stretch (usually mid-shin level), then squeeze your glutes to stand back up.",tips:"This is NOT a squat — your knees barely bend. Think about pushing your hips back to touch the wall behind you. The dumbbells should travel close to your legs the entire time, almost grazing your shins. Keep your back flat (neutral spine) — if it rounds, you've gone too far.",muscles:"Hamstrings, glutes, lower back"},
+  calf_raises:{name:"Single-Leg Calf Raises",category:"Lower Body",equipment:"Bodyweight / Step",description:"Stand on one foot on a step or raised surface with your heel hanging off the edge. Hold onto something for balance. Lower your heel below the step level (you'll feel a stretch in your calf), then push up onto your toes as high as you can. Complete all reps on one leg before switching.",tips:"Go through the full range of motion — all the way down, all the way up. Pause at the top for a count. If you can do 15 easily, hold a dumbbell in one hand.",muscles:"Calves (gastrocnemius, soleus)"},
+  glute_bridges:{name:"Glute Bridges",category:"Lower Body",equipment:"Bodyweight",description:"Lie on your back with knees bent and feet flat on the floor, hip-width apart. Drive through your heels to lift your hips until your body forms a straight line from knees to shoulders. Squeeze your glutes hard at the top, then lower back down.",tips:"To progress, do them single-leg: extend one leg straight out and bridge on the other. You can also place a heavy dumbbell across your hips for resistance. Don't hyperextend your back at the top — stop when your body is in a straight line.",muscles:"Glutes, hamstrings, lower back"},
+  db_rows:{name:"Dumbbell Bent-Over Rows",category:"Upper Pull",equipment:"Dumbbells",description:"Hinge forward at the hips (about 45° forward lean) with a dumbbell in each hand hanging straight down, palms facing each other. Pull the dumbbells up toward your lower ribs by squeezing your shoulder blades together, then lower under control. You can also do these one arm at a time with the other hand braced on a bench or chair.",tips:"Think about pulling with your elbows, not your hands. Your elbows should drive up and back, finishing close to your ribcage. Don't jerk the weight — if you have to use momentum, it's too heavy. Keep your core tight and back flat.",muscles:"Upper back (lats, rhomboids), biceps, rear deltoids"},
+  bicep_curls:{name:"Dumbbell Bicep Curls",category:"Upper Pull",equipment:"Dumbbells",description:"Stand holding dumbbells at your sides, palms facing forward. Curl both dumbbells up toward your shoulders by bending at the elbow only. Squeeze at the top, then lower slowly (the lowering is where the growth happens).",tips:"Keep your elbows pinned to your sides — they shouldn't drift forward. If you're swinging your whole body to get the weight up, go lighter. You can alternate arms or do both together.",muscles:"Biceps, forearms"},
+  reverse_flyes:{name:"Reverse Flyes",category:"Upper Pull",equipment:"Dumbbells",description:"Hinge forward at the hips (similar position to bent-over rows). Hold light dumbbells hanging below you, palms facing each other. With a slight bend in your elbows, raise both arms out to the sides in an arc until they're roughly parallel with the floor. Lower slowly.",tips:"Use light weight — 2-4kg is often enough. This targets the small muscles in your upper back and rear shoulders. Squeeze your shoulder blades together at the top. If you feel this in your lower back, you're standing too upright.",muscles:"Rear deltoids, rhomboids, upper back"},
+  superman:{name:"Superman Holds",category:"Core",equipment:"Bodyweight",description:"Lie face down with arms extended in front of you (like Superman flying). Simultaneously lift your arms, chest, and legs off the ground — hold for the prescribed time — then lower everything back down.",tips:"You don't need to lift very high — a few inches off the ground is plenty. Focus on squeezing your glutes and lower back. Keep your neck neutral (look at the floor, not forward). Breathe normally while holding.",muscles:"Lower back (erector spinae), glutes, upper back"},
+  leg_raises:{name:"Lying Leg Raises",category:"Core",equipment:"Bodyweight",description:"Lie on your back with legs straight and hands under your hips for support (or gripping something behind your head). Keeping your legs straight, raise them until they point at the ceiling, then lower them slowly back down — stopping just before they touch the floor.",tips:"The key is controlling the lowering phase and keeping your lower back pressed into the floor. If your back arches off the ground, don't lower your legs as far. Bend your knees slightly if the straight-leg version is too difficult at first.",muscles:"Lower abdominals, hip flexors"},
+  side_plank:{name:"Side Plank",category:"Core",equipment:"Bodyweight",description:"Lie on your side propped up on one forearm, elbow directly under your shoulder. Stack your feet (or stagger them for more stability). Lift your hips off the ground so your body forms a straight line from head to feet. Hold.",tips:"Don't let your hips sag — the most common mistake. If 30 seconds is easy, raise your top leg or add a hip dip (lower hips toward floor and lift back up). This is the exercise that most directly targets the obliques — the muscles under your love handles.",muscles:"Obliques, core stabilisers, shoulders"},
+  db_thrusters:{name:"Dumbbell Thrusters",category:"Full Body",equipment:"Dumbbells",description:"Hold a dumbbell in each hand at shoulder height (the 'rack' position). Squat down to parallel, then as you stand up explosively, use that momentum to press both dumbbells overhead in one fluid motion. Lower the dumbbells back to your shoulders as you begin the next squat.",tips:"This is a combination of a front squat and an overhead press — it's brutal in the best way. The press should flow naturally from the squat; don't pause between the two movements. Start with moderate weight until the coordination clicks.",muscles:"Quads, glutes, shoulders, triceps, core — basically everything"},
+  bench_press:{name:"Barbell Bench Press",category:"Upper Push",equipment:"Barbell + Bench",description:"Lie on a flat bench with your eyes directly under the bar. Grip the bar slightly wider than shoulder-width. Unrack it, lower it to your mid-chest (roughly nipple line) with control, then press it back up to full arm extension. Your feet should be flat on the floor, your shoulder blades squeezed together and pressed into the bench.",tips:"Arch your upper back slightly (not your lower back) and keep your shoulder blades retracted throughout — this protects your shoulders and creates a stable pressing platform. The bar should touch your chest, not bounce off it. Have someone spot you when going heavy, or use a rack with safety pins.",muscles:"Chest, shoulders, triceps"},
+  barbell_ohp:{name:"Barbell Overhead Press",category:"Upper Push",equipment:"Barbell",description:"Stand with the barbell resting on your front shoulders (the 'front rack' position). Grip just outside shoulder-width. Press the bar straight up, moving your head slightly back to let the bar pass your face, then push your head through once the bar clears — locking out directly over your shoulders.",tips:"Squeeze your glutes and brace your core hard before every rep — this creates a stable base. The bar should travel in a straight vertical line (not an arc out in front of you). This is the best shoulder exercise that exists and a genuine measure of upper body strength.",muscles:"Shoulders, triceps, upper chest, core (stabilisation)"},
+  barbell_squat:{name:"Barbell Back Squat",category:"Lower Body",equipment:"Barbell + Squat Rack",description:"Set the bar on your upper traps (high bar) or rear deltoids (low bar). Unrack it, step back, feet shoulder-width or slightly wider with toes turned out 15-30°. Take a big breath, brace your core, and squat down by pushing your hips back and bending your knees. Go at least to parallel (hip crease at or below knee level), then drive back up through your whole foot.",tips:"The barbell squat is the king of all exercises. Start with just the bar (20kg) and add weight slowly over weeks as your form solidifies. Keep your chest up, knees tracking over toes, and core braced throughout. If you've been doing goblet squats in Phase 1, the movement pattern will feel familiar.",muscles:"Quads, glutes, hamstrings, core, lower back — full body engagement"},
+  barbell_deadlift:{name:"Barbell Deadlift",category:"Lower Body",equipment:"Barbell",description:"Stand with feet hip-width apart, the barbell over mid-foot. Hinge at the hips and bend your knees to grip the bar just outside your legs. Flatten your back, brace your core, and stand up by driving through your feet — straightening your hips and knees simultaneously. The bar should travel in a straight line, staying close to your body. Reverse the motion to lower it.",tips:"If you've been doing Romanian deadlifts with dumbbells in Phase 1, you already understand the hip hinge — the conventional deadlift just starts from the floor. Keep the bar against your legs (wear long socks or pants). Don't round your back. Start light — the form needs to be locked in before you chase weight. This is the exercise where you'll eventually move the most weight and feel the most powerful.",muscles:"Entire posterior chain — hamstrings, glutes, lower back, upper back, traps, grip"},
+  barbell_row:{name:"Barbell Bent-Over Row",category:"Upper Pull",equipment:"Barbell",description:"Hold a barbell with an overhand grip, hands just wider than shoulder-width. Hinge at the hips (torso about 45° forward), letting the bar hang at arm's length. Pull the bar up to your lower stomach, squeezing your shoulder blades together, then lower under control.",tips:"Same movement as the dumbbell rows you've been doing — just with a barbell so you can load it heavier. Keep your core tight and avoid jerking the weight. If your torso is bouncing up and down to move the bar, go lighter.",muscles:"Lats, rhomboids, rear deltoids, biceps, lower back"},
+  lat_pulldown:{name:"Lat Pulldown",category:"Upper Pull",equipment:"Cable Machine",description:"Sit at the lat pulldown machine with your thighs secured under the pads. Grip the wide bar with an overhand grip, hands wider than shoulder-width. Pull the bar down to your upper chest by driving your elbows down and back. Control the bar back up to full stretch.",tips:"Lean back very slightly (10-15°) and pull to your upper chest, not behind your neck. Think about pulling with your elbows, not your hands — your hands are just hooks. This is the exercise that builds the V-shaped back (wide lats).",muscles:"Lats, biceps, upper back"},
+  leg_press:{name:"Leg Press",category:"Lower Body",equipment:"Leg Press Machine",description:"Sit in the leg press with your feet shoulder-width apart on the platform, positioned in the middle or slightly high. Release the safety handles and lower the weight by bending your knees toward your chest until your thighs are at about 90°. Press the weight back up without locking your knees completely at the top.",tips:"Don't go so deep that your lower back rounds off the seat — that's a recipe for injury. This is a great complement to squats because it lets you go heavy with less technical demand. Vary your foot placement (higher = more hamstring/glute, lower = more quad).",muscles:"Quads, glutes, hamstrings"},
+  kettlebell_swings:{name:"Kettlebell Swings",category:"Full Body",equipment:"Kettlebell",description:"Stand with feet wider than shoulder-width, kettlebell on the floor slightly in front of you. Hinge at the hips to grab it with both hands, then 'hike' it back between your legs. Explosively snap your hips forward to swing the kettlebell up to chest or eye height. Let it fall back down, hinging at the hips to absorb it, and immediately swing again.",tips:"This is a HIP exercise, not an arm exercise. Your arms are just along for the ride. The power comes from your hips snapping forward — like a standing jump without leaving the ground. Don't squat the swing. Keep your core tight and squeeze your glutes hard at the top of each swing.",muscles:"Glutes, hamstrings, core, shoulders, grip — incredible conditioning tool"},
+};
+
+const PHASE1 = [
+  {day:"Monday",title:"Upper Body Push + Core",duration:"35 min",color:"#E86C3A",exercises:[
+    {id:"pushups",sets:"4 sets",reps:"to near failure",note:"Elevate feet once bodyweight becomes easy"},
+    {id:"db_overhead_press",sets:"3 sets",reps:"10-12 reps"},
+    {id:"db_chest_press_floor",sets:"3 sets",reps:"10-12 reps"},
+    {id:"lateral_raises",sets:"3 sets",reps:"12-15 reps",note:"Use light weight — form over ego"},
+    {id:"plank",sets:"3 sets",reps:"45-60 sec hold"},
+    {id:"dead_bugs",sets:"3 sets",reps:"10 each side"},
+  ]},
+  {day:"Tuesday",title:"Lower Body",duration:"35 min",color:"#D4885A",note:"Legs are the biggest muscle group in your body. Training them hard burns the most energy, drives the strongest hormonal response for muscle growth, and contributes more to fat loss than any number of bicep curls. Don't skip this day.",exercises:[
+    {id:"goblet_squat",sets:"4 sets",reps:"12-15 reps",note:"Use the heaviest dumbbell you can handle with good form"},
+    {id:"walking_lunges",sets:"3 sets",reps:"10 each leg"},
+    {id:"rdl",sets:"3 sets",reps:"12 reps"},
+    {id:"calf_raises",sets:"3 sets",reps:"15 each leg"},
+    {id:"glute_bridges",sets:"3 sets",reps:"15 reps",note:"Progress to single-leg when bilateral becomes easy"},
+  ]},
+  {day:"Wednesday",title:"Active Recovery",duration:"30 min",color:"#7BA05B",note:"This is not a rest day — it's a recovery day. The goal is to move your body, promote blood flow, and stay limber without creating fatigue. Think easy effort — you should be able to hold a full conversation throughout.",exercises:[
+    {id:null,name:"Easy swim (500-800m)",description:"Relaxed pace. Mix strokes. Focus on breathing and form, not speed."},
+    {id:null,name:"OR: 30-min walk + mobility",description:"Walk at a conversational pace, then spend 10 minutes stretching — hip flexors, hamstrings, thoracic spine rotations, shoulder dislocates with a towel."},
+  ]},
+  {day:"Thursday",title:"Upper Body Pull + Core",duration:"35 min",color:"#8B7355",exercises:[
+    {id:"db_rows",sets:"4 sets",reps:"10-12 reps"},
+    {id:"bicep_curls",sets:"3 sets",reps:"12 reps"},
+    {id:"reverse_flyes",sets:"3 sets",reps:"12-15 reps"},
+    {id:"superman",sets:"3 sets",reps:"30 sec hold"},
+    {id:"leg_raises",sets:"3 sets",reps:"12 reps"},
+    {id:"side_plank",sets:"3 sets",reps:"30 sec each side"},
+  ]},
+  {day:"Friday",title:"Full Body Circuit",duration:"35 min",color:"#C75D30",note:"This replaces your old 3k jog as your main conditioning session. It combines strength and cardio into one brutal, efficient package. You'll do 5 rounds with minimal rest between exercises and 2 minutes rest between rounds.",exercises:[
+    {id:"db_thrusters",sets:"5 rounds",reps:"10 reps"},
+    {id:"pushups",sets:"5 rounds",reps:"10 reps"},
+    {id:"goblet_squat",sets:"5 rounds",reps:"10 reps"},
+    {id:"db_rows",sets:"5 rounds",reps:"10 each arm"},
+    {id:null,name:"200m track run",description:"Run 200m on the track between rounds. This should feel hard by round 3. That's the point."},
+  ]},
+  {day:"Sat / Sun",title:"Active Living",duration:"Flexible",color:"#999",note:"One day: do something active you enjoy — swim, jog, cycle, hike, play a sport. Doesn't matter what, just move. Other day: full rest or a light walk. Don't sit still all weekend, but don't grind either. Recovery is when your muscles actually grow.",exercises:[]},
+];
+
+const PHASE2 = [
+  {day:"Monday",title:"Upper Push (Gym)",duration:"40 min",color:"#E86C3A",exercises:[
+    {id:"bench_press",sets:"4 sets",reps:"6-8 reps",note:"Main compound lift — work up to challenging weight"},
+    {id:"barbell_ohp",sets:"3 sets",reps:"8-10 reps"},
+    {id:"lateral_raises",sets:"3 sets",reps:"12-15 reps"},
+    {id:"pushups",sets:"2 sets",reps:"to failure",note:"Burnout finisher — chest should be torched by now"},
+    {id:"plank",sets:"3 sets",reps:"45-60 sec"},
+    {id:"dead_bugs",sets:"3 sets",reps:"10 each side"},
+  ]},
+  {day:"Tuesday",title:"Legs (Gym)",duration:"40 min",color:"#D4885A",note:"The barbell squat and deadlift are the two most important exercises in the gym. Start lighter than you think you need to — form is everything for the first few weeks. You're building a foundation that will carry years of progression.",exercises:[
+    {id:"barbell_squat",sets:"4 sets",reps:"6-8 reps",note:"Start with just the bar (20kg) if needed — no shame, all gain"},
+    {id:"leg_press",sets:"3 sets",reps:"10-12 reps"},
+    {id:"rdl",sets:"3 sets",reps:"10-12 reps",note:"Can use barbell now instead of dumbbells"},
+    {id:"calf_raises",sets:"3 sets",reps:"15 each leg"},
+    {id:"glute_bridges",sets:"3 sets",reps:"12 reps",note:"Use a barbell across your hips for resistance"},
+  ]},
+  {day:"Wednesday",title:"Active Recovery",duration:"30 min",color:"#7BA05B",note:"Same as Phase 1 — swim, walk, stretch. Your body will need this even more now that you're lifting heavier loads.",exercises:[
+    {id:null,name:"Easy swim (500-800m)",description:"Relaxed pace. Focus on breathing."},
+    {id:null,name:"OR: 30-min walk + mobility",description:"Walk + hip, hamstring, and thoracic spine stretching."},
+  ]},
+  {day:"Thursday",title:"Upper Pull (Gym)",duration:"40 min",color:"#8B7355",exercises:[
+    {id:"barbell_row",sets:"4 sets",reps:"8-10 reps",note:"Main compound pull — the row is to your back what the bench is to your chest"},
+    {id:"lat_pulldown",sets:"3 sets",reps:"10-12 reps"},
+    {id:"reverse_flyes",sets:"3 sets",reps:"12-15 reps"},
+    {id:"bicep_curls",sets:"3 sets",reps:"10-12 reps"},
+    {id:"leg_raises",sets:"3 sets",reps:"12 reps",note:"Hanging from a bar if the gym has one — much harder and more effective"},
+    {id:"side_plank",sets:"3 sets",reps:"30 sec each side"},
+  ]},
+  {day:"Friday",title:"Conditioning (Gym)",duration:"35 min",color:"#C75D30",note:"Same circuit structure as Phase 1, but with heavier tools. If the gym has kettlebells, this session gets significantly better.",exercises:[
+    {id:"kettlebell_swings",sets:"5 rounds",reps:"15 reps",note:"If no kettlebell, substitute dumbbell thrusters"},
+    {id:"pushups",sets:"5 rounds",reps:"12 reps"},
+    {id:"barbell_squat",sets:"5 rounds",reps:"8 reps",note:"Use ~60% of your working weight — conditioning, not max effort"},
+    {id:"barbell_row",sets:"5 rounds",reps:"8 reps"},
+    {id:null,name:"250m rowing machine",description:"If available — otherwise 200m treadmill sprint. Row hard, get your heart rate up."},
+  ]},
+  {day:"Sat / Sun",title:"Active Living",duration:"Flexible",color:"#999",note:"Same as Phase 1 — one active day, one rest day. As you get stronger and leaner, you'll find you naturally want to do more on weekends. Follow that instinct, but don't add structured training. Your body needs the recovery.",exercises:[]},
+];
+
+const SOUPS = [
+  {name:"Red Lentil Soup (Masoor Dhal)",protein:"~18g",calories:"~350",desc:"Red lentils, onion, garlic, tomato, turmeric, cumin, curry leaves. Blend smooth or leave chunky. Dead simple, very filling, and lentils are everywhere in SL. Add a squeeze of lime and a spoon of coconut cream on top.",batch:"Makes 6+ portions"},
+  {name:"Chicken & Vegetable Soup",protein:"~30g",calories:"~300",desc:"Bone-in chicken pieces, carrot, leeks, beans, celery if available, garlic, ginger, peppercorns. Simmer for an hour. The bone-in chicken gives you rich broth AND protein. Shred the chicken before serving.",batch:"Makes 5-6 portions"},
+  {name:"Spicy Prawn Soup",protein:"~25g",calories:"~250",desc:"Prawns (fresh from the market), lemongrass, lime leaves, chilli, garlic, fish sauce, tomato. A Sri Lankan twist on tom yum. High protein, low calorie, incredibly flavourful.",batch:"Makes 4 portions (best fresh)"},
+  {name:"Mulligatawny",protein:"~20g",calories:"~380",desc:"A classic that bridges your SL and German/British life — curried lentil and chicken soup with apple and cream. Use less cream and more chicken to keep the macros right.",batch:"Makes 6+ portions"},
+  {name:"Leek & Potato Soup (Modified)",protein:"~15g",calories:"~280",desc:"Reduce the potato, increase the leek, and add chunks of chicken breast or white fish. Use yogurt instead of cream for the finish. Hits the Heimatgefühl without the calorie bomb.",batch:"Makes 5-6 portions"},
+];
+
+const INTL_MEALS = [
+  {name:"Eier in Senfsoße",protein:"~25g",calories:"~400",desc:"Already a solid choice — eggs are pure protein. Use less butter in the roux, sub some of the cream with yogurt. Serve with a small portion of boiled potatoes or skip the starch entirely and have it with steamed vegetables."},
+  {name:"Gurkengemüse",protein:"~8g",calories:"~150",desc:"Low calorie side dish. Great paired with a protein — serve alongside grilled chicken breast or pan-fried fish for a complete meal."},
+  {name:"Chicken in Peanut Sauce",protein:"~35g",calories:"~450",desc:"High protein and satisfying. Use natural peanut butter (not the sweetened kind), coconut aminos or soy sauce, chilli, garlic, lime. Serve over cauliflower rice instead of regular rice to cut carbs while keeping the experience."},
+  {name:"Chili con Carne (High Protein)",protein:"~40g",calories:"~420",desc:"Use lean beef or turkey mince, double the beans (kidney, black), lots of tomato, cumin, smoked paprika. Skip the sour cream, add avocado if available. One of the best meal-prep foods that exists — tastes better the next day."},
+  {name:"Thai-Style Larb / Lettuce Wraps",protein:"~30g",calories:"~280",desc:"Minced chicken or pork with lime, fish sauce, chilli, shallots, mint, served in lettuce cups. Very low carb, extremely flavourful, and quick to make."},
+];
+
+const SCORE_ITEMS = [
+  {key:"sessions",label:"Hit 4+ training sessions"},
+  {key:"protein",label:"Hit protein target 5+ days"},
+  {key:"carbs",label:"Kept rice/carbs controlled"},
+  {key:"noJunk",label:"No unplanned junk/snacking"},
+  {key:"weighed",label:"Weighed myself 2+ mornings"},
+];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let currentTab = 'home';
+let currentPhase = 1;
+let viewStack = []; // for back navigation
+
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+function loadData(key, fallback) {
+  try { const d = localStorage.getItem('ctf_' + key); return d ? JSON.parse(d) : fallback; }
+  catch(e) { return fallback; }
+}
+function saveData(key, val) {
+  try { localStorage.setItem('ctf_' + key, JSON.stringify(val)); } catch(e) {}
+}
+
+function getWeekKey() {
+  const d = new Date();
+  const start = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
+  return d.getFullYear() + '-W' + week;
+}
+
+// ═══════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  viewStack = [];
+  document.querySelectorAll('.page').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+  const page = document.getElementById('page-' + tab);
+  if (page) { page.style.display = 'block'; page.classList.add('active'); }
+  document.querySelectorAll('.nav-btn').forEach((b, i) => {
+    const tabs = ['home','training','exercises','nutrition','travel','log'];
+    b.classList.toggle('active', tabs[i] === tab);
+  });
+  document.getElementById('mainNav').style.display = '';
+  document.getElementById('headerBack').style.display = 'none';
+  document.getElementById('headerTitle').textContent = 'Cut the Fluff';
+  document.getElementById('headerSub').textContent = 'Your training companion';
+  document.getElementById('mainHeader').style.background = '#1C1917';
+  if (tab === 'training') renderDays();
+  if (tab === 'exercises') renderExerciseLibrary();
+  if (tab === 'nutrition') { renderSoups(); renderIntlMeals(); }
+  if (tab === 'log') { renderScorecard(); renderLogEntries(); }
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  if (viewStack.length) {
+    const prev = viewStack.pop();
+    if (prev.type === 'tab') switchTab(prev.tab);
+    else if (prev.type === 'day') showDay(prev.index, true);
+    else switchTab(currentTab);
+  } else {
+    switchTab(currentTab);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TRAINING
+// ═══════════════════════════════════════════════
+function setPhase(p) {
+  currentPhase = p;
+  document.getElementById('phase1btn').className = p === 1 ? 'btn' : 'btn-outline';
+  document.getElementById('phase2btn').className = p === 2 ? 'btn' : 'btn-outline';
+  document.getElementById('phaseDesc1').style.display = p === 1 ? '' : 'none';
+  document.getElementById('phaseDesc2').style.display = p === 2 ? '' : 'none';
+  renderDays();
+}
+
+function getDays() { return currentPhase === 1 ? PHASE1 : PHASE2; }
+
+function renderDays() {
+  const container = document.getElementById('daysList');
+  const days = getDays();
+  container.innerHTML = days.map((d, i) => `
+    <div class="card card-clickable day-card" style="border-left-color:${d.color}" onclick="${d.exercises.length ? 'showDay('+i+')' : ''}">
+      <div>
+        <div class="day-label" style="color:${d.color}">${d.day}</div>
+        <div class="day-title">${d.title}</div>
+        <div class="day-meta">${d.exercises.length} exercise${d.exercises.length !== 1 ? 's' : ''} · ${d.duration}</div>
+      </div>
+      ${d.exercises.length ? '<span class="chevron-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 4 10 8 6 12"/></svg></span>' : ''}
+    </div>
+  `).join('');
+}
+
+function showDay(index, isBack) {
+  if (!isBack) viewStack.push({ type: 'tab', tab: currentTab });
+  const d = getDays()[index];
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.getElementById('mainNav').style.display = 'none';
+  document.getElementById('headerBack').style.display = '';
+  document.getElementById('headerTitle').textContent = d.title;
+  document.getElementById('headerSub').textContent = d.day + ' · ' + d.duration + ' · Phase ' + currentPhase;
+  document.getElementById('mainHeader').style.background = d.color || '#1C1917';
+
+  const page = document.getElementById('page-day');
+  page.style.display = 'block';
+  page.innerHTML = (d.note ? `<div class="card card-warm" style="border-color:${d.color}33"><p class="p-small" style="margin:0">${d.note}</p></div>` : '') +
+    (d.exercises.length === 0 ? '<p class="p">No structured workout — enjoy active living or full rest.</p>' : '') +
+    d.exercises.map((ex, i) => {
+      const detail = ex.id ? EXERCISES[ex.id] : null;
+      return `<div class="card ${ex.id ? 'card-clickable' : ''}" ${ex.id ? 'onclick="showExercise(\''+ex.id+'\', true)"' : ''}>
+        <div class="ex-row" style="border:none;padding:0">
+          <div style="flex:1">
+            <div class="ex-name">${detail ? detail.name : ex.name}</div>
+            ${ex.sets ? '<span class="ex-detail" style="margin-right:8px">'+ex.sets+'</span>' : ''}
+            ${ex.reps ? '<span class="ex-detail" style="font-weight:600;color:var(--stone-500)">'+ex.reps+'</span>' : ''}
+            ${ex.note ? '<div class="ex-note">'+ex.note+'</div>' : ''}
+            ${!ex.id && ex.description ? '<div class="ex-desc">'+ex.description+'</div>' : ''}
+            ${detail ? '<div class="ex-muscles">'+detail.muscles+'</div>' : ''}
+          </div>
+          ${ex.id ? '<span class="chevron-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 4 10 8 6 12"/></svg></span>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════
+// EXERCISE DETAIL
+// ═══════════════════════════════════════════════
+function showExercise(id, fromDay) {
+  const ex = EXERCISES[id];
+  if (!ex) return;
+  if (fromDay) viewStack.push({ type: 'day', index: getDays().findIndex(d => d.exercises.some(e => e.id === id)) });
+  else viewStack.push({ type: 'tab', tab: currentTab });
+
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.getElementById('mainNav').style.display = 'none';
+  document.getElementById('headerBack').style.display = '';
+  document.getElementById('headerTitle').textContent = ex.name;
+  document.getElementById('headerSub').textContent = ex.category;
+  document.getElementById('mainHeader').style.background = '#1C1917';
+
+  const page = document.getElementById('page-exercise');
+  page.style.display = 'block';
+  page.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <span class="tag tag-orange">${ex.category}</span>
+      <span class="tag tag-brown">${ex.equipment}</span>
+    </div>
+    <h3 style="margin-top:0">How to Do It</h3>
+    <p class="p">${ex.description}</p>
+    <h3>Coaching Tips</h3>
+    <p class="p">${ex.tips}</p>
+    <div class="card card-warm" style="border-color:rgba(232,108,58,0.2)">
+      <div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:4px">Muscles Worked</div>
+      <div style="font-size:14px;color:var(--stone-700)">${ex.muscles}</div>
+    </div>
+  `;
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════
+// EXERCISE LIBRARY
+// ═══════════════════════════════════════════════
+function renderExerciseLibrary() {
+  const categories = ["Upper Push", "Upper Pull", "Lower Body", "Core", "Full Body"];
+  const container = document.getElementById('exerciseLibrary');
+  container.innerHTML = categories.map(cat => {
+    const exs = Object.entries(EXERCISES).filter(([,e]) => e.category === cat);
+    if (!exs.length) return '';
+    return `<h3>${cat}</h3>` + exs.map(([key, ex]) => `
+      <div class="card card-clickable" onclick="showExercise('${key}', false)" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:14px;font-weight:700">${ex.name}</div>
+          <div style="font-size:12px;color:var(--stone-400)">${ex.equipment} · ${ex.muscles.split(',')[0]}</div>
+        </div>
+        <span class="chevron-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 4 10 8 6 12"/></svg></span>
+      </div>
+    `).join('');
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// NUTRITION
+// ═══════════════════════════════════════════════
+function renderSoups() {
+  document.getElementById('soupList').innerHTML = SOUPS.map(s => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="meal-title">${s.name}</div>
+        <span style="font-size:11px;color:var(--stone-400)">${s.batch}</span>
+      </div>
+      <div class="meal-tags">
+        <span class="tag tag-orange">${s.protein} protein</span>
+        <span class="tag tag-brown">${s.calories}/serving</span>
+      </div>
+      <p class="p-small">${s.desc}</p>
+    </div>
+  `).join('');
+}
+
+function renderIntlMeals() {
+  document.getElementById('intlMealList').innerHTML = INTL_MEALS.map(m => `
+    <div class="card">
+      <div class="meal-title">${m.name}</div>
+      <div class="meal-tags">
+        <span class="tag tag-orange">${m.protein} protein</span>
+        <span class="tag tag-brown">${m.calories}/serving</span>
+      </div>
+      <p class="p-small">${m.desc}</p>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+// LOG — SCORECARD
+// ═══════════════════════════════════════════════
+function renderScorecard() {
+  const weekKey = getWeekKey();
+  const scores = loadData('scores', {});
+  const current = scores[weekKey] || {};
+  const total = SCORE_ITEMS.filter(s => current[s.key]).length;
+
+  document.getElementById('scorecardContainer').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600;color:var(--stone-500)">${weekKey}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--orange)">${total}/5</div>
+    </div>
+    ${SCORE_ITEMS.map(s => `
+      <div class="check-row ${current[s.key] ? 'checked' : ''}" onclick="toggleScore('${s.key}')">
+        <div class="check-box ${current[s.key] ? 'checked' : ''}">
+          ${current[s.key] ? '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"><polyline points="3 8 7 12 13 4"/></svg>' : ''}
+        </div>
+        <span class="check-label">${s.label}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function toggleScore(key) {
+  const weekKey = getWeekKey();
+  const scores = loadData('scores', {});
+  if (!scores[weekKey]) scores[weekKey] = {};
+  scores[weekKey][key] = !scores[weekKey][key];
+  saveData('scores', scores);
+  renderScorecard();
+}
+
+// ═══════════════════════════════════════════════
+// LOG — ENTRIES
+// ═══════════════════════════════════════════════
+function renderLogEntries() {
+  const entries = loadData('log', []);
+  const container = document.getElementById('logEntries');
+  if (!entries.length) {
+    container.innerHTML = `<div class="card" style="text-align:center;color:var(--stone-400);padding:32px 20px">
+      <div style="font-size:14px">No entries yet</div>
+      <div style="font-size:12px;margin-top:4px">Add your first log entry to start tracking progress</div>
+    </div>`;
+    return;
+  }
+  container.innerHTML = entries.map(e => `
+    <div class="card">
+      <div class="log-entry-header">
+        <div style="font-size:14px;font-weight:700">${e.date}</div>
+        <button class="log-delete" onclick="deleteLogEntry(${e.id})">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 4 4 14 12 14 13 4"/><line x1="1" y1="4" x2="15" y2="4"/><path d="M6 4V2h4v2"/></svg>
+        </button>
+      </div>
+      <div class="log-entry-tags">
+        ${e.weight ? '<span class="tag tag-orange">'+e.weight+' kg</span>' : ''}
+        ${e.protein ? '<span class="tag tag-green">'+e.protein+'g protein</span>' : ''}
+        ${e.sessions ? '<span class="tag tag-brown">'+e.sessions+' sessions</span>' : ''}
+      </div>
+      ${e.notes ? '<p class="p-small" style="margin-top:8px">'+e.notes+'</p>' : ''}
+    </div>
+  `).join('');
+}
+
+function toggleLogForm() {
+  const form = document.getElementById('logForm');
+  const isActive = form.classList.contains('active');
+  form.classList.toggle('active');
+  if (!isActive) {
+    document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('logWeight').value = '';
+    document.getElementById('logProtein').value = '';
+    document.getElementById('logSessions').value = '';
+    document.getElementById('logNotes').value = '';
+  }
+}
+
+function saveLogEntry() {
+  const entry = {
+    id: Date.now(),
+    date: document.getElementById('logDate').value,
+    weight: document.getElementById('logWeight').value,
+    protein: document.getElementById('logProtein').value,
+    sessions: document.getElementById('logSessions').value,
+    notes: document.getElementById('logNotes').value,
+  };
+  const entries = loadData('log', []);
+  entries.unshift(entry);
+  saveData('log', entries);
+  toggleLogForm();
+  renderLogEntries();
+}
+
+function deleteLogEntry(id) {
+  const entries = loadData('log', []).filter(e => e.id !== id);
+  saveData('log', entries);
+  renderLogEntries();
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+function exportData() {
+  const data = {
+    log: loadData('log', []),
+    scores: loadData('scores', {}),
+    exportDate: new Date().toISOString(),
+    version: 1,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'cut-the-fluff-data-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.log) saveData('log', data.log);
+      if (data.scores) saveData('scores', data.scores);
+      renderScorecard();
+      renderLogEntries();
+      alert('Data imported successfully!');
+    } catch(err) {
+      alert('Error importing data. Please check the file format.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+switchTab('home');
+</script>
+</body>
+</html>
